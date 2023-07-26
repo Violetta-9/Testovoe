@@ -2,10 +2,12 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Test.Model;
 using Microsoft.Extensions.Caching.Memory;
+using Test.Resources;
 
 namespace Test.Application
 {
@@ -14,6 +16,8 @@ namespace Test.Application
         private const string statesListCacheKey = "statesList";
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _cache;
+        private const int cacheSlidingExpirationSeconds = 60;
+        private const int cacheAbsoluteExpirationSeconds = 3600;
 
         public GettingStatesInfoToMemoryQuery(HttpClient httpClient,IMemoryCache cache)
         {
@@ -30,19 +34,19 @@ namespace Test.Application
 
             using (var response = await _httpClient.GetAsync(""))
             {
-                if (response.EnsureSuccessStatusCode().IsSuccessStatusCode)
+                if (!response.IsSuccessStatusCode)
                 {
-                    var responseString = await response.Content.ReadAsStringAsync();
-                    var result = JsonConvert.DeserializeObject<List<StateInfo>>(responseString);
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetSlidingExpiration(TimeSpan.FromSeconds(60))
-                        .SetAbsoluteExpiration(TimeSpan.FromSeconds(3600))
-                        .SetPriority(CacheItemPriority.Normal);
-                    _cache.Set(statesListCacheKey, result, cacheEntryOptions);
-                    return result;
+                    throw new Exception(String.Format(Messages.StatusCode,response.StatusCode));
                 }
-
-                throw new Exception($"Status code is {response.EnsureSuccessStatusCode()}");
+                var responseString = await response.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<List<StateInfo>>(responseString);
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromSeconds(cacheSlidingExpirationSeconds))
+                    .SetAbsoluteExpiration(TimeSpan.FromSeconds(cacheAbsoluteExpirationSeconds))
+                    .SetPriority(CacheItemPriority.Normal);
+                _cache.Set(statesListCacheKey, result, cacheEntryOptions);
+                return result;
+                
             }
 
         }

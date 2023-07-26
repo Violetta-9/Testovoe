@@ -26,12 +26,8 @@ namespace Test
 
             services.AddControllers();
             services.AddMemoryCache();
-            services.AddScoped<GetStatesInfoQuery>();
-            services.AddScoped<IGettingInfo, GettingStatesInfoToMemoryQuery>();
-            services.AddScoped<IInfectionLevelQuery, GetStatesInfoQuery>();
-            services.AddScoped<IPositivityTestLevelQuery, GetStatesInfoQuery>();
-            services.AddScoped<IOverallQuery, GetStatesInfoQuery>();
-            services.AddScoped<ICasesPer100kLevelQuery, GetStatesInfoQuery>();
+            services.AddScoped<IGeneralQuery,GetStatesInfoQuery>();
+
 
            
             services.AddHttpClient<IGettingInfo,GettingStatesInfoToMemoryQuery>(c =>

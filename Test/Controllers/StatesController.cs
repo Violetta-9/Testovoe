@@ -16,9 +16,9 @@ namespace Test.Controllers
     public class StatesController : ControllerBase
     {
      
-        private readonly GetStatesInfoQuery _query;
+        private readonly IGeneralQuery _query;
 
-        public StatesController(GetStatesInfoQuery query)
+        public StatesController(IGeneralQuery query)
         {
             
             _query= query;

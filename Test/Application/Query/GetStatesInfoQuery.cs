@@ -6,7 +6,7 @@ using Test.DTO;
 
 namespace Test.Application.Query
 {
-    public class GetStatesInfoQuery:IOverallQuery,IPositivityTestLevelQuery,IInfectionLevelQuery,ICasesPer100kLevelQuery
+    public class GetStatesInfoQuery:IGeneralQuery
     {
         private readonly IGettingInfo _gettingInfo;
 
